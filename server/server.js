@@ -55,16 +55,16 @@ app.listen(3000, () => {
 app.delete('/todos/:id', (req, res) => {
     var id = req.params.id;
 
-    if(ObjectID.isValid(id)){
+    if(!ObjectID.isValid(id)){
         return res.status(404).send('Id is not valid');
     }
 
     Todo.findByIdAndRemove(id).then((todo) => {
         if(!todo){
-            return res.status(404).send('No Todo');
+            return res.status(404).send();
         }
 
-        return res.status(200).send('success');
+        return res.status(200).send(todo);
     }).catch((e) => {
         return res.status(400).send();
     });
