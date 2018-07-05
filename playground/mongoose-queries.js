@@ -9,7 +9,7 @@ if(!ObjectID.isValid(id)){
     console.log('Id not valid.');
 }
 
-/*Todo.find({
+Todo.find({
     _id: id
 }).then((todos) => {
     console.log('Todos', todos);
@@ -26,7 +26,7 @@ Todo.findById(id).then((todo) => {
         return console.log('Id not found.');
     }
     console.log('Todo By id', todo);
-}).catch((e) => console.log(e));*/
+}).catch((e) => console.log(e));
 
 User.findById('5b2a79ec878c537f16efa7b9').then((user) => {
     if(!user){
