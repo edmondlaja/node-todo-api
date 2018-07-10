@@ -1,6 +1,7 @@
-var express = require('express');
-var bodyparser = require('body-parser')
+const express = require('express');
+const bodyparser = require('body-parser')
 const {ObjectID} = require('mongodb');
+const _ = require('lodash');
 
 var {mongoose} = require('./db/mongoose')
 var {Todo} = require('./models/todo')
@@ -48,10 +49,6 @@ app.get('/todos/:id', (req, res) => {
     });
 });
 
-app.listen(3000, () => {
-    console.log('Started on port 3000.');
-});
-
 app.delete('/todos/:id', (req, res) => {
     var id = req.params.id;
 
@@ -68,4 +65,44 @@ app.delete('/todos/:id', (req, res) => {
     }).catch((e) => {
         return res.status(400).send();
     });
+});
+
+app.patch('/todos/:id', (req, res) => {
+    var id = req.params.id;
+    var body = _.pick(req.body, ['text', 'completed']);
+
+    if(!ObjectID.isValid(id)){
+        return res.status(404).send('Id is not valid');
+    }
+
+    if(_.isBoolean(body.completed) && body.completed){
+        body.completedAt = new Date().getTime();
+    }else{
+        body.completed = false;
+        body.completedAt = null;
+    }
+
+    Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+        if(!todo)
+            return res.status(404).send();
+
+        res.send({todo});
+    }).catch((e) => {
+        res.status(400).send();
+    })
+});
+
+app.post('/users', (req, res) => {
+    var body = _.pick(req.body, ['email', 'password']);
+    var user = new User(body);
+
+    user.save().then((user) => {
+        res.send(user);
+    }).catch((e) => {
+        res.status(400).send(e);
+    })
+});
+
+app.listen(3000, () => {
+    console.log('Started on port 3000.');
 });
